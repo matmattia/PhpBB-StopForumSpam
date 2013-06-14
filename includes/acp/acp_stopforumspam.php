@@ -25,7 +25,8 @@ class acp_stopforumspam {
 			'FROM' => array(
 				USERS_TABLE => 'u'
 			),
-			'ORDER_BY' => 'user_regdate DESC'
+			'WHERE' => 'u.user_type <> 2',
+			'ORDER_BY' => 'u.user_regdate DESC'
 		);
 		$sql = $db->sql_build_query('SELECT', $sql_arr);
 		$res = $db->sql_query_limit($sql, self::USERS_PER_PAGE, $start);

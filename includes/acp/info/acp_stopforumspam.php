@@ -6,7 +6,7 @@ class acp_stopforumspam_info
         return array(
             'filename'    => 'acp_stopforumspam',
             'title'        => 'StopForumSpam',
-            'version'    => '1.0.0',
+            'version'    => '1.0.1',
             'modes'        => array(
                 'index'        => array('title' => 'StopForumSpam', 'auth' => 'acl_a_', 'cat' => array('')),
             ),
