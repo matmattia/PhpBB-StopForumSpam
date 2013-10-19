@@ -1,5 +1,6 @@
 <?php
 class acp_stopforumspam {
+	const API_KEY = ''; // API Key - ex.: const API_KEY = 'abcdef123';
 	const USERS_PER_PAGE = 15;
 	
 	/**
@@ -21,7 +22,7 @@ class acp_stopforumspam {
 		$users = array();
 		$start = request_var('start', 0);
 		$sql_arr = array(
-			'SELECT' => 'u.user_id AS USER_ID, u.username AS USERNAME, u.user_email AS USER_EMAIL',
+			'SELECT' => 'u.user_id AS USER_ID, u.username AS USERNAME, u.user_email AS USER_EMAIL, u.user_ip AS USER_IP',
 			'FROM' => array(
 				USERS_TABLE => 'u'
 			),
@@ -44,6 +45,7 @@ class acp_stopforumspam {
 			'SFS_USERS_JSON' => json_encode($users),
 			'SFS_P' => implode('&', $p),
 			'SFS_USERS_DELETE_URL' => append_sid($phpbb_admin_path.'index.'.$phpEx, 'i=stopforumspam&mode=index', false),
+			'SFS_API_KEY' => is_string(self::API_KEY) && trim(self::API_KEY) != '' ? trim(self::API_KEY) : '',
 			'SFS_NUM_USERS' => $this->countUsers(),
 			'SFS_PAGE_NUMBER' => on_page($this->countUsers(), self::USERS_PER_PAGE, $start),
 			'SFS_PAGINATION' => generate_pagination(append_sid($phpbb_admin_path.'index.'.$phpEx, 'i=stopforumspam&mode=index', false), $this->countUsers(), self::USERS_PER_PAGE, $start)
