@@ -1,6 +1,7 @@
 <?php
 class acp_stopforumspam {
-	const API_KEY = ''; // API Key - ex.: const API_KEY = 'abcdef123';
+	const API_KEY = '6rnvebiuxd9a3w'; // API Key - ex.: const API_KEY = 'abcdef123';
+	const IP_BAN = -1; // IP ban length in minutes (0: permanent ban, -1: no IP ban)
 	const USERS_PER_PAGE = 15;
 	
 	/**
@@ -83,11 +84,14 @@ class acp_stopforumspam {
 		$res = false;
 		if (is_numeric($user_id) && $user_id > 0) {
 			include($phpbb_root_path.'includes/functions_user.php');
-			$db->sql_query('SELECT user_email FROM '.USERS_TABLE.'  WHERE user_id = '.intval($user_id).' LIMIT 1');
-			$user_email = $db->sql_fetchfield('user_email');
-			if (validate_email($user_email)) {
+			$user_res = $db->sql_query('SELECT user_email, user_ip FROM '.USERS_TABLE.'  WHERE user_id = '.intval($user_id).' LIMIT 1');
+			$user = $db->sql_fetchrow($user_res);
+			if ($user && validate_email($user['user_email'])) {
 				user_delete('remove', $user_id);
-				user_ban('email', $user_email, 0, false, false, '');
+				user_ban('email', $user['user_email'], 0, false, false, '');
+				if (self::IP_BAN >= 0) {
+					user_ban('ip', $user['user_ip'], self::IP_BAN, false, false, '');
+				}
 				$res = true;
 			}
 		}
