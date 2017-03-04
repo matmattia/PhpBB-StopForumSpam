@@ -1,12 +1,14 @@
 <?php
-class acp_stopforumspam_info
+namespace matriz\stopforumspam\acp;
+
+class main_info
 {
     function module()
     {
         return array(
-            'filename'    => 'acp_stopforumspam',
+            'filename'    => '\matriz\stopforumspam\acp\main_module',
             'title'        => 'StopForumSpam',
-            'version'    => '1.2.0',
+            'version'    => '2.0.1',
             'modes'        => array(
                 'index'        => array('title' => 'StopForumSpam', 'auth' => 'acl_a_', 'cat' => array('')),
             ),

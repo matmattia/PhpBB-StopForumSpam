@@ -1,0 +1,32 @@
+<!-- INCLUDE overall_header.html -->
+<div class="pagination"><!-- IF .pagination --><a href="#" onclick="jumpto();return false;" title="{L_JUMP_TO_PAGE}">{SFS_PAGE_NUMBER}</a> &bull; <span><!-- INCLUDE pagination.html --></span><!-- ELSE -->{SFS_PAGE_NUMBER}<!-- ENDIF --></div>
+<h1>{L_USERS}</h1>
+<table cellspacing="1">
+	<thead>
+		<tr>
+			<th>ID</th>
+			<th>{L_USERNAME}</th>
+			<th>{L_EMAIL}</th>
+			<th>{L_IP}</th>
+			<th></th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		<!-- BEGIN users -->
+			<!-- IF users.S_ROW_COUNT is even -->
+				<tr class="row1">
+			<!-- ELSE -->
+				<tr class="row2">
+			<!-- ENDIF -->
+				<td>{users.USER_ID}</td>
+				<td>{users.USERNAME}</td>
+				<td>{users.USER_EMAIL}</td>
+				<td>{users.USER_IP}</td>
+				<td id="sfs_result_{users.USER_ID}" class="fontelico-spin4" style="font-family: 'fontelico';">&nbsp;</td>
+				<td><a href="{users.URL}" class="button2">{L_GO}</a></td>
+			</tr>
+		<!-- END users -->
+	</tbody>
+</table>
+<!-- INCLUDE overall_footer.html -->

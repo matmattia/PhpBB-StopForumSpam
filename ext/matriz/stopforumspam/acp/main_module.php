@@ -1,6 +1,8 @@
 <?php
-class acp_stopforumspam {
-	const API_KEY = '6rnvebiuxd9a3w'; // API Key - ex.: const API_KEY = 'abcdef123';
+namespace matriz\stopforumspam\acp;
+
+class main_module {
+	const API_KEY = ''; // API Key - ex.: const API_KEY = 'abcdef123';
 	const IP_BAN = -1; // IP ban length in minutes (0: permanent ban, -1: no IP ban)
 	const USERS_PER_PAGE = 15;
 	
@@ -10,8 +12,8 @@ class acp_stopforumspam {
 	 */
 	private $num_users;
 	
-	function main() {
-		global $db, $template, $phpbb_admin_path, $phpEx;
+	function main($id, $mode) {
+		global $db, $template, $phpbb_container, $phpbb_admin_path, $phpEx;
 		$delete_user = request_var('delete_user', 0);
 		if (is_numeric($delete_user) && $delete_user > 0) {
 			echo json_encode(array('ok' => $this->deleteUser($delete_user) ? 1 : 0));
@@ -42,14 +44,17 @@ class acp_stopforumspam {
 		}
 		$db->sql_freeresult($res);
 		unset($res);
+		$pagination = $phpbb_container->get('pagination');
+		$base_url = append_sid($phpbb_admin_path.'index.'.$phpEx, 'i='.preg_replace('/([^a-z0-9_-]+)/i', '-', $id).'&mode='.$mode, false);
+		$pagination->generate_template_pagination($base_url, 'pagination', 'start', $this->countUsers(), self::USERS_PER_PAGE, $start);
 		$template->assign_vars(array(
+			'SFS_IS' => true,
 			'SFS_USERS_JSON' => json_encode($users),
 			'SFS_P' => implode('&', $p),
-			'SFS_USERS_DELETE_URL' => append_sid($phpbb_admin_path.'index.'.$phpEx, 'i=stopforumspam&mode=index', false),
+			'SFS_USERS_DELETE_URL' => $base_url,
 			'SFS_API_KEY' => is_string(self::API_KEY) && trim(self::API_KEY) != '' ? trim(self::API_KEY) : '',
 			'SFS_NUM_USERS' => $this->countUsers(),
-			'SFS_PAGE_NUMBER' => on_page($this->countUsers(), self::USERS_PER_PAGE, $start),
-			'SFS_PAGINATION' => generate_pagination(append_sid($phpbb_admin_path.'index.'.$phpEx, 'i=stopforumspam&mode=index', false), $this->countUsers(), self::USERS_PER_PAGE, $start)
+			'SFS_PAGE_NUMBER' => $pagination->on_page($this->countUsers(), self::USERS_PER_PAGE, $start)
 		));
 		unset($users, $p);
 	}
@@ -86,7 +91,7 @@ class acp_stopforumspam {
 			include($phpbb_root_path.'includes/functions_user.php');
 			$user_res = $db->sql_query('SELECT user_email, user_ip FROM '.USERS_TABLE.'  WHERE user_id = '.intval($user_id).' LIMIT 1');
 			$user = $db->sql_fetchrow($user_res);
-			if ($user && validate_email($user['user_email'])) {
+			if ($user && phpbb_validate_email($user['user_email']) === false) {
 				user_delete('remove', $user_id);
 				user_ban('email', $user['user_email'], 0, false, false, '');
 				if (self::IP_BAN >= 0) {
